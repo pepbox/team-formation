@@ -1,0 +1,46 @@
+.MuiFormLabel-root {
+  color: #ffffff !important;
+  font-size: 16px !important;
+}
+
+input {
+  color: #fff !important;
+  font-size: 16px !important;
+}
+
+input::placeholder{
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.MuiInput-underline:before {
+  border-bottom: 1px solid #ffffff61 !important;
+  /* border-bottom: none !important; */
+}
+
+.MuiInput-underline:hover:before {
+  border-bottom: 1px solid #fff !important;
+  /* border:none !important; */
+}
+.MuiInput-underline:after {
+  border-bottom: 2px solid #fff !important;
+  /* border:none !important; */
+}
+
+.not-mandate .MuiFormLabel-root{
+  color:#6f6f6f !important;
+}
+.not-mandate input::placeholder{
+    color:#6f6f6f !important;
+}
+
+.not-mandate .MuiInput-underline:before {
+  border-bottom: 1px solid #6f6f6f !important;
+}
+
+.not-mandate .MuiInput-underline:hover:before {
+  border-bottom: 1px solid #6f6f6f !important;
+}
+.not-mandate .MuiInput-underline:after {
+  border-bottom: 2px solid #6f6f6f !important;
+}
