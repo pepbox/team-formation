@@ -3,21 +3,31 @@ import AppError from "../../../utils/appError";
 import PlayerService from "../services/playerService";
 import { generateAccessToken } from "../../../utils/jwtUtils";
 import TeamService from "../services/teamService";
+import SessionService from "../../session/services/sessionService";
 
 export const createPlayer = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { firstName, lastName } = req.body;
+  const { firstName, lastName, sessionId } = req.body;
 
-  if (!firstName || !lastName) {
-    return next(new AppError("First name and last name are required.", 400));
+  if (!firstName || !lastName || !sessionId) {
+    return next(
+      new AppError("First name ,last name and sessionId are required.", 400)
+    );
   }
   try {
+
+    const session = await SessionService.fetchSessionById(sessionId);
+    if (!session) {
+      return next(new AppError("Session not found.", 404));
+    }
+
     const player = await PlayerService.createPlayer({
       firstName,
       lastName,
+      sessionId: session._id,
       profileImage: req.body.profileImage,
       teamId: req.body.teamId,
     });
@@ -129,7 +139,9 @@ export const voteForLeader = async (
     }
 
     if (currentPlayer.teamId?.toString() !== votedLeader.teamId?.toString()) {
-      return next(new AppError("You can only vote for players in your team.", 400));
+      return next(
+        new AppError("You can only vote for players in your team.", 400)
+      );
     }
 
     const updatedPlayer = await PlayerService.updatePlayer({

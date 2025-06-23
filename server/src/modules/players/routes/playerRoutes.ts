@@ -2,16 +2,17 @@ import { Router } from "express";
 import * as playerControllers from "../controllers/playerController";
 import * as teamControllers from "../controllers/teamControllers";
 
-const router = Router();
+const protectedPlayerRouter = Router();
+const publicPlayerRouter= Router();
 
-router.post("/create", playerControllers.createPlayer);
-router.get("/fetch", playerControllers.fetchPlayer);
-router.get("/fetch-my-team", playerControllers.fetchMyTeam);
-router.post("/vote-for-leader", playerControllers.voteForLeader);
-
-
-router.post("/assign-teamname", teamControllers.assignTeamName);
-router.post("/fetch-all-teams", teamControllers.getAllTeamsData);
+publicPlayerRouter.post("/create", playerControllers.createPlayer);
+protectedPlayerRouter.get("/fetch", playerControllers.fetchPlayer);
+protectedPlayerRouter.get("/fetch-my-team", playerControllers.fetchMyTeam);
+protectedPlayerRouter.post("/vote-for-leader", playerControllers.voteForLeader);
 
 
-export default router;
+protectedPlayerRouter.post("/assign-teamname", teamControllers.assignTeamName);
+protectedPlayerRouter.post("/fetch-all-teams", teamControllers.getAllTeamsData);
+
+
+export { publicPlayerRouter,protectedPlayerRouter};

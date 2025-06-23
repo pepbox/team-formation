@@ -5,17 +5,20 @@ export default class PlayerService {
   static async createPlayer({
     firstName,
     lastName,
+    sessionId,
     profileImage,
     teamId,
   }: {
     firstName: string;
     lastName: string;
+    sessionId: mongoose.Types.ObjectId | string;
     profileImage?: string;
     teamId?: string;
   }) {
     const player = new Player({
       firstName,
       lastName,
+      sessionId,
       profileImage,
       teamId,
     });
@@ -34,12 +37,14 @@ export default class PlayerService {
     playerId,
     firstName,
     lastName,
+    sessionId,
     profileImage,
     votedLeader,
   }: {
     playerId: mongoose.Types.ObjectId | string;
     firstName?: string;
     lastName?: string;
+    sessionId?: mongoose.Types.ObjectId | string;
     profileImage?: string;
     votedLeader?: mongoose.Types.ObjectId | string;
   }) {
@@ -48,6 +53,7 @@ export default class PlayerService {
     if (lastName) updateData.lastName = lastName;
     if (profileImage) updateData.profileImage = profileImage;
     if (votedLeader) updateData.votedLeader = votedLeader;
+    if (sessionId) {updateData.sessionId = sessionId;}
 
     return await Player.findByIdAndUpdate(playerId, updateData, {
       new: true,
