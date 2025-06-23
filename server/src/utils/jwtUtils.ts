@@ -13,20 +13,30 @@ export const generateAccessToken = (id: string,role:"USER"|"ADMIN") => {
   );
 };
 
-export const generateRefreshToken = (id: string) => {
-  return jwt.sign(
-    { id },
-    process.env.REFRESH_TOKEN_SECRET as string,
-    {
-      expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRY || '604800', 10), 
-    }
-  );
-};
 
-export const verifyToken = (token: string) => {
+export const verifyAccessToken = (token: string) => {
   try {
-    return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET as string);
+    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
   } catch (error) {
     throw new Error('Invalid token');
   }
-};
+}
+
+
+// export const generateRefreshToken = (id: string) => {
+//   return jwt.sign(
+//     { id },
+//     process.env.REFRESH_TOKEN_SECRET as string,
+//     {
+//       expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRY || '604800', 10), 
+//     }
+//   );
+// };
+
+// export const verifyToken = (token: string) => {
+//   try {
+//     return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET as string);
+//   } catch (error) {
+//     throw new Error('Invalid token');
+//   }
+// };

@@ -8,9 +8,6 @@ dotenv.config();
 export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
   
   const token = req.cookies.accessToken;
-  
-
-
   if (!token) {
     res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
     return; // Ensure function exits here
