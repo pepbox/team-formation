@@ -5,10 +5,14 @@ const playerSchema = new Schema<IPlayer>(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    profileImage: { type: String, required: true },
+    profileImage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "File",
+      required: true,
+    },
     sessionId: { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
     votedLeader: { type: Schema.Types.ObjectId, ref: "Player" },
-    teamId: { type: Schema.Types.ObjectId, ref: "Team", required: true },
+    teamId: { type: Schema.Types.ObjectId, ref: "Team" },
   },
   {
     timestamps: true,

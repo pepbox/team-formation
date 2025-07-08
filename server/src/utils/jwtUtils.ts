@@ -1,34 +1,42 @@
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-export const generateAccessToken = (id: string,role:"USER"|"ADMIN") => {
+export interface AccessTokenPayload {
+  id: string;
+  role: "USER" | "ADMIN";
+  sessionId: string;
+}
+
+export const generateAccessToken = (payload: AccessTokenPayload) => {
+  const { id, role, sessionId } = payload;
   return jwt.sign(
-    { id ,role},
+    { id, role, sessionId },
     process.env.ACCESS_TOKEN_SECRET as string,
     {
-      expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRY || '900', 10), 
+      expiresIn: parseInt(process.env.ACCESS_TOKEN_EXPIRY || "900", 10),
     }
   );
 };
 
-
-export const verifyAccessToken = (token: string) => {
+export const verifyAccessToken = (token: string): AccessTokenPayload => {
   try {
-    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
+    return jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET as string
+    ) as AccessTokenPayload;
   } catch (error) {
-    throw new Error('Invalid token');
+    throw new Error("Invalid token");
   }
-}
-
+};
 
 // export const generateRefreshToken = (id: string) => {
 //   return jwt.sign(
 //     { id },
 //     process.env.REFRESH_TOKEN_SECRET as string,
 //     {
-//       expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRY || '604800', 10), 
+//       expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRY || '604800', 10),
 //     }
 //   );
 // };

@@ -3,9 +3,10 @@ import { ITeam } from "../types/team";
 
 const teamSchema = new Schema<ITeam>(
   {
-    teamNumber: { type: Number, required: true, unique: true },
+    teamNumber: { type: Number, required: true },
+    teamName: { type: String, default: null },
     sessionId: { type: Schema.Types.ObjectId, ref: "Session", required: true },
-    leaderId: { type: Schema.Types.ObjectId, ref: "Player", required: true },
+    leaderId: { type: Schema.Types.ObjectId, ref: "Player" },
   },
   {
     timestamps: true,

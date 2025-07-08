@@ -1,3 +1,5 @@
 export enum AllToServerEvents {}
 
-export enum ServerToAllEvents {}
+export enum ServerToAllEvents {
+    SESSION_UPDATE="SESSION_UPDATE"
+}

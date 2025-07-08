@@ -1,20 +1,36 @@
-import { Socket } from 'socket.io';
-import jwt from 'jsonwebtoken';
+import { Socket } from "socket.io";
+import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "../utils/jwtUtils";
 
-export const socketAuthMiddleware = (socket: Socket, next: (err?: Error) => void) => {
-  const token = socket.handshake.auth?.token;
-  if (!token) return next(new Error('Token missing'));
+export const socketAuthMiddleware = (
+  socket: Socket,
+  next: (err?: Error) => void
+) => {
+  // const token = socket.handshake.auth?.token;
+  const cookies = socket.handshake.headers?.cookie;
+  if (!cookies) {
+    return next(new Error("Authentication cookie required"));
+  }
+
+  const token = parseCookieValue(cookies, "accessToken");
+
+  if (!token) return next(new Error("Token missing"));
 
   try {
-    const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
+    const payload = verifyAccessToken(token);
 
-    if (typeof payload === 'object' && payload.role) {
+    if (typeof payload === "object" && payload.role) {
       (socket as any).user = payload;
       return next();
     }
 
-    next(new Error('Invalid payload structure'));
+    next(new Error("Invalid payload structure"));
   } catch {
-    next(new Error('Invalid token'));
+    next(new Error("Invalid token"));
   }
 };
+
+function parseCookieValue(cookies: string, cookieName: string): string | null {
+  const match = cookies.match(new RegExp(`(^| )${cookieName}=([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
+}
