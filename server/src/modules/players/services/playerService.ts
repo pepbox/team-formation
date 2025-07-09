@@ -123,6 +123,18 @@ export default class PlayerService {
     return await query;
   }
 
+  async getPlayerBySessionIdAndName(
+    sessionId: mongoose.Types.ObjectId | string,
+    firstName: string,
+    lastName: string
+  ) {
+    return Player.findOne({
+      sessionId,
+      firstName,
+      lastName,
+    }).lean();
+  }
+
   async getPlayersByTeamId(teamId: mongoose.Types.ObjectId | string) {
     const query = Player.find({ teamId }).populate("profileImage", "location");
     if (this.session) {

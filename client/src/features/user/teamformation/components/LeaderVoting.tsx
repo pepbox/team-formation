@@ -48,6 +48,10 @@ const LeaderVoting = () => {
         }));
         setWinners(winnersList);
       }
+      else{
+        navigate(`/user/${sessionId}/our-captain`);
+        return;
+      }
       const chosenLeader = data.data.chosenLeader;
       dispatch(setLeader({ teamLeaderId: chosenLeader._id }));
     }

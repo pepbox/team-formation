@@ -10,7 +10,7 @@ const Header = () => {
   const { user } = useSelector((state: RootState) => state.adminAuth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { navigate } = useAdminSessionNavigate();
+  const { adminSessionBasePath } = useAdminSessionNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -29,7 +29,8 @@ const Header = () => {
   }, []);
 
   const handleMenuClick = (path: string) => {
-    navigate(path);
+    window.open(`${adminSessionBasePath}/${path}`, "_blank");
+
     setIsDropdownOpen(false);
   };
 

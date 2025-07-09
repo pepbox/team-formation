@@ -50,6 +50,22 @@ export const createPlayer = async (
       );
     }
 
+    const existingPlayer = await playerService.getPlayerBySessionIdAndName(
+      sessionId,
+      firstName,
+      lastName
+    );
+
+    if (existingPlayer) {
+      deleteFromS3(req.file.key!);
+      return next(
+        new AppError(
+          `Player with name ${firstName} ${lastName} already exists in this session.`,
+          400
+        )
+      );
+    }
+
     const profileImageInfo = {
       originalName: req.file.originalname!,
       fileName: req.file.key!,
