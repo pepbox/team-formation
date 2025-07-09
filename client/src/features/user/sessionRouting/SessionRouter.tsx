@@ -36,7 +36,7 @@ const routeConfigs: RouteConfig[] = [
   {
     path: "leader-voting",
     element: LeaderVoting,
-    allowedStates: [SessionStates.LEADER_VOTING],
+    allowedStates: [SessionStates.LEADER_VOTING,SessionStates.FINAL],
   },
   {
     path: "our-captain",

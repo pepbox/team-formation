@@ -17,9 +17,10 @@ const OtherTeam = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  const { players, teamName, teamNumber, teamLeaderId, _id } = data?.data;
+  const { players, teamName, teamNumber, leaderId, _id } = data?.data;
 
   console.log("OtherTeam data", data.data);
+  console.log("LeaderId", leaderId);
   return (
     <div className="p-4">
       <div className="flex flex-col flex-1 w-full mt-4">
@@ -37,10 +38,10 @@ const OtherTeam = () => {
         </div>
         {players?.map((member: any) => (
           <TeamMemberCard
-            key={member._id}
+            key={member.id}
             profileImage={member.profileImage}
             playerName={member.firstName + " " + member.lastName}
-            isCaptain={member._id === teamLeaderId}
+            isCaptain={member.id === leaderId}
             isMe={member._id === _id}
           />
         ))}

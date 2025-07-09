@@ -7,14 +7,16 @@ import {
 } from "../../player/playerApi";
 import { setLeader, setVotedLeader } from "../../player/playerSlice";
 import VotingTimer from "../../../session/components/VotingTimer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SessionStates } from "../../../session/types/sessionStates";
+import MultipleWinnersSpin from "./MultipleWinnersSpin";
 
 const LeaderVoting = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { teamNumber, votedLeader, _id } = useSelector(
+  const [winners, setWinners] = useState<any[] | null>(null);
+  const { teamNumber, votedLeader, _id, teamLeaderId } = useSelector(
     (state: RootState) => state.player
   );
   const [voteForLeader, { isLoading }] = useVoteForLeaderMutation();
@@ -39,6 +41,13 @@ const LeaderVoting = () => {
 
   useEffect(() => {
     if (data?.data.chosenLeader) {
+      if (data?.data.winners?.length > 1) {
+        const winnersList = data.data.winners.map((winner: any) => ({
+          name: winner.name,
+          id: winner._id,
+        }));
+        setWinners(winnersList);
+      }
       const chosenLeader = data.data.chosenLeader;
       dispatch(setLeader({ teamLeaderId: chosenLeader._id }));
     }
@@ -52,6 +61,9 @@ const LeaderVoting = () => {
 
   return (
     <div className="p-4">
+      {winners && (
+        <MultipleWinnersSpin winners={winners} chosenWinner={teamLeaderId ??""} />
+      )}
       <p className="text-[24px] mt-4 font-mono font-bold text-white text-center">
         Voting
       </p>
