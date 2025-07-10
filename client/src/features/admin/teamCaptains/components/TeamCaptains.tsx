@@ -2,9 +2,11 @@ import { useTeamsData } from "../../../session/useTeamsPlayersData";
 import teamCaptainsBg from "../../../../assets/images/backgrounds/team-captains-bg.webp";
 import CaptainCard from "./CaptainCard";
 import BackButton from "../../../../components/utility/BackButton";
+import useAdminSessionNavigate from "../../../../hooks/useAdminNavigate";
 
 const TeamCaptains = () => {
   const { teams: teamsData, isLoading } = useTeamsData();
+  const { adminSessionBasePath } = useAdminSessionNavigate();
 
   if (isLoading) return <div>Loading teams...</div>;
   return (
@@ -15,7 +17,11 @@ const TeamCaptains = () => {
         backgroundSize: "cover",
       }}
     >
-      <BackButton className="text-white"/>  
+      <BackButton
+        className="text-white"
+        backPath={`${adminSessionBasePath}/dashboard`}
+      />
+
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Team Captains</h1>

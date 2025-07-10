@@ -2,9 +2,11 @@ import { useTeamsData } from "../../../session/useTeamsPlayersData";
 import TeamCard from "./TeamCard";
 import meetTheTeamsBg from "../../../../assets/images/backgrounds/meet-the-teams-bg.webp";
 import BackButton from "../../../../components/utility/BackButton";
+import useAdminSessionNavigate from "../../../../hooks/useAdminNavigate";
 
 const MeetTheTeam = () => {
   const { teams: teamsData, isLoading } = useTeamsData();
+  const { adminSessionBasePath } = useAdminSessionNavigate();
 
   if (isLoading) return <div>Loading teams...</div>;
   return (
@@ -15,7 +17,7 @@ const MeetTheTeam = () => {
         backgroundSize: "cover",
       }}
     >
-      <BackButton className="text-white" />
+      <BackButton className="text-white" backPath={`${adminSessionBasePath}/dashboard`} />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
