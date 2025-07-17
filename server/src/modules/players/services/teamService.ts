@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Team } from "../models/team";
 import { ITeam } from "../types/team";
 import { TEAM_COLORS } from "../../../utils/teamColors";
+import axios from "axios";
 
 export default class TeamService {
   private session?: mongoose.ClientSession;
@@ -61,6 +62,17 @@ export default class TeamService {
       teamName: TEAM_COLORS[i].option,
       sessionId,
     }));
+    const payload = {
+      gameSessionId: sessionId,
+      totalTeams: numberOfTeams,
+    };
+
+    try {
+      await axios.post(`${process.env.SUPER_ADMIN_SERVER_URL}/update`, payload);
+      console.log("Session data sent to super admin server successfully.");
+    } catch (axiosError) {
+      console.error('Error sending session data:', axiosError);
+    }
     const options: any = {};
     if (this.session) {
       options.session = this.session;

@@ -86,6 +86,20 @@ export const createPlayer = async (
       teamId: req.body.teamId,
     });
 
+    // Get player count for the session
+    const playerCount = await playerService.countPlayersBySessionId(session._id);
+
+    const payload = {
+      gameSessionId: session._id,
+      totalPlayers: playerCount,
+    };
+
+    try {
+      await axios.post(`${process.env.SUPER_ADMIN_SERVER_URL}/update`, payload);
+    } catch (axiosError) {
+      console.error('Error sending session data:', axiosError);
+    }
+
     const token = generateAccessToken({
       id: player._id.toString(),
       role: "USER",

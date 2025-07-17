@@ -26,7 +26,7 @@ const EditTeamNamePopup: React.FC<EditTeamNamePopupProps> = ({
   };
   if (!isOpen || !teamId) return null;
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-3">
       <div className="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 className="text-xl font-bold mb-4">Edit Team Name</h2>
         <form>

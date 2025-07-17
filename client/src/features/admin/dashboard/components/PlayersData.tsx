@@ -85,9 +85,13 @@ const PlayersData: React.FC<PlayersDataProps> = ({ data }) => {
     return null;
   }
   return (
-    <div className="px-20">
-      <h1 className="mx-5 my-3"><b>Total Players :</b> {playerData.length}</h1>
+    <div className="px-4 sm:px-8 md:px-16 lg:px-20">
+      <h1 className="mx-2 sm:mx-5 my-3 text-base sm:text-lg">
+      <b>Total Players :</b> {playerData.length}
+      </h1>
+      <div className="overflow-x-auto">
       <CustomTable columns={columns} data={playerData} keyField="id" />
+      </div>
     </div>
   );
 };

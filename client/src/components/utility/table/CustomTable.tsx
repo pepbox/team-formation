@@ -37,7 +37,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
       return (
         <ActionComponent
           onClick={handleClick}
-          handler={()=>column.handler!(row)}
+          handler={() => column.handler!(row)}
           {...(column.componentProps || {})}
         />
       );
@@ -49,13 +49,13 @@ const CustomTable: React.FC<CustomTableProps> = ({
   return (
     <div className="w-full bg-white rounded-lg">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[600px] sm:min-w-0 hidden sm:table">
           <thead>
             <tr>
               {columns.map((column, index) => (
                 <th
                   key={index}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider"
+                  className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider"
                 >
                   {column.header}
                 </th>
@@ -71,7 +71,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
                 {columns.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className="px-6 py-3 whitespace-nowrap text-sm"
+                    className="px-2 sm:px-6 py-3 whitespace-nowrap text-sm"
                   >
                     {renderCell(column, row)}
                   </td>
@@ -80,6 +80,24 @@ const CustomTable: React.FC<CustomTableProps> = ({
             ))}
           </tbody>
         </table>
+        {/* Mobile view */}
+        <div className="sm:hidden flex flex-col gap-4">
+          {data.map((row, rowIndex) => (
+            <div
+              key={row[keyField] || rowIndex}
+              className="bg-gray-50 rounded-lg shadow p-4"
+            >
+              {columns.map((column, colIndex) => (
+                <div key={colIndex} className="flex justify-between py-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    {column.header}
+                  </span>
+                  <span className="text-sm">{renderCell(column, row)}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -76,16 +76,18 @@ const TeamsData: React.FC<TeamsDataProps> = ({ data }) => {
     return null;
   }
   return (
-    <div className="px-20">
-      <h1 className="mx-5 my-3">
-        <b>Total Teams :</b> {teamsData.length}
+    <div className="px-4 sm:px-8 md:px-12 lg:px-20 w-full">
+      <h1 className="mx-2 sm:mx-5 my-3 text-base sm:text-lg">
+      <b>Total Teams :</b> {teamsData.length}
       </h1>
 
+      <div className="overflow-x-auto">
       <CustomTable columns={columns} data={teamsData} keyField="id" />
+      </div>
       <EditTeamNamePopup
-        teamId={editTeamNameId || ""}
-        isOpen={editTeamNameId ? true : false}
-        onClose={() => setEditTeamNameId(null)}
+      teamId={editTeamNameId || ""}
+      isOpen={!!editTeamNameId}
+      onClose={() => setEditTeamNameId(null)}
       />
     </div>
   );

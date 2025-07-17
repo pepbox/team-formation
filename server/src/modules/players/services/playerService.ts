@@ -212,4 +212,12 @@ export default class PlayerService {
       options
     );
   }
+
+  async countPlayersBySessionId(sessionId: mongoose.Types.ObjectId | string): Promise<number> {
+    const query = Player.countDocuments({ sessionId });
+    if (this.session) {
+      query.session(this.session);
+    }
+    return await query;
+  }
 }

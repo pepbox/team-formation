@@ -35,25 +35,27 @@ const Topbar: React.FC<TopbarProps> = ({ tabs, activeTab, setActiveTab }) => {
   };
 
   return (
-    <div className="flex items-center justify-between px-20 py-2">
-      <div className="flex gap-2">
-        {tabs.map(
-          (tab, index) =>
-            tab.show && (
-              <button
-                key={index}
-                onClick={() => setActiveTab(tab.id)}
-                className={`border-1 px-4 py-2 border-black rounded-lg cursor-pointer ${
-                  activeTab === tab.id ? null : "opacity-50"
-                }`}
-              >
-                {tab.name}
-              </button>
-            )
-        )}
+    <div className="flex flex-col md:flex-row items-center justify-between px-4 md:px-20 py-2 gap-4 md:gap-0">
+      <div className="flex flex-wrap gap-2 justify-center md:justify-start w-full md:w-auto">
+      {tabs.map(
+        (tab, index) =>
+        tab.show && (
+          <button
+          key={index}
+          onClick={() => setActiveTab(tab.id)}
+          className={`border-1 px-4 py-2 border-black rounded-lg cursor-pointer ${
+            activeTab === tab.id ? "" : "opacity-50"
+          }`}
+          >
+          {tab.name}
+          </button>
+        )
+      )}
       </div>
       {/* Controls */}
-      <div>{renderControls()}</div>
+      <div className="w-full md:w-auto flex justify-center md:justify-end">
+      {renderControls()}
+      </div>
     </div>
   );
 };
