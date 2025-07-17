@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { ISession } from "../types/session";
+import { ISession, TeamType } from "../types/session";
 import { SessionStates } from "../types/sessionStates";
 
 const sessionSchema = new Schema<ISession>(
@@ -21,6 +21,11 @@ const sessionSchema = new Schema<ISession>(
       type: String,
       enum: SessionStates,
       default: SessionStates.TEAM_JOINING,
+    },
+    teamType: {
+      type: String,
+      enum: Object.values(TeamType),
+      default: TeamType.NUMBER,
     },
     gameLinked: { type: Boolean, default: false },
     paused: { type: Boolean, default: false },

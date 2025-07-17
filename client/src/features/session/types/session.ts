@@ -8,4 +8,6 @@ export interface Session {
   gameLinked: boolean;
   votingStartTime: Date | null;
   votingDuration: number | null;
+  teamType: string | null; // Added teamType to track the type of team formation
+  numberOfTeams: number; 
 }

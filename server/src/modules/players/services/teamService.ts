@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Team } from "../models/team";
 import { ITeam } from "../types/team";
+import { TEAM_COLORS } from "../../../utils/teamColors";
 
 export default class TeamService {
   private session?: mongoose.ClientSession;
@@ -57,6 +58,7 @@ export default class TeamService {
     const teamDocs = Array.from({ length: numberOfTeams }, (_, i) => ({
       teamNumber: i + 1,
       leaderId: null,
+      teamName: TEAM_COLORS[i].option,
       sessionId,
     }));
     const options: any = {};

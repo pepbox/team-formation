@@ -10,6 +10,8 @@ const initialState: Session = {
   gameLinked: false,
   votingStartTime: null,
   votingDuration: null,
+  teamType: null,
+  numberOfTeams: 0,
 };
 
 const sessionSlice = createSlice({
@@ -47,6 +49,7 @@ const sessionSlice = createSlice({
         } = action.payload.data;
         state.paused = paused;
         state.state = sessionState;
+        state.teamType = action.payload.data.teamType || null; // Ensure teamType is set
         state.gameLinked = action.payload.data.gameLinked || false;
         state.sessionId = action.payload.data._id;
         state.sessionName = sessionName || null;
@@ -54,6 +57,7 @@ const sessionSlice = createSlice({
           ? new Date(votingStartTime)
           : null;
         state.votingDuration = votingDuration || null;
+        state.numberOfTeams = action.payload.data.numberOfTeams || 0; // Ensure numberOfTeams is set
       }
     );
   },

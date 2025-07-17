@@ -13,6 +13,7 @@ const initialState: Player = {
   teamNumber: null,
   teamMembers: null,
   teamLeaderId: null,
+  teamType: "", // Added to store team type
 };
 
 const playerSlice = createSlice({
@@ -20,6 +21,7 @@ const playerSlice = createSlice({
   initialState,
   reducers: {
     setTeam: (state, action) => {
+      state.teamType = action.payload.teamType ?? state.teamType;
       state.teamName = action.payload.teamName ?? state.teamName;
       state.teamNumber = action.payload.teamNumber ?? state.teamNumber;
       state.teamMembers = action.payload.teamMembers ?? state.teamMembers;

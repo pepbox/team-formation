@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import { SessionStates } from "./sessionStates";
 
+export enum TeamType {
+  NUMBER = "number",
+  COLOR = "color"
+}
+
 export interface ISession {
   sessionName:string;
   gameSessionId: mongoose.Types.ObjectId;
@@ -11,6 +16,7 @@ export interface ISession {
   numberOfTeams: number | null;
   state: SessionStates;
   paused: boolean;
+  teamType: TeamType;
   gameLinked: boolean;
   votingDuration: number | null;
   votingStartTime: Date | null;

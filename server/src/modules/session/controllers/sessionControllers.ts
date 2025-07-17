@@ -10,6 +10,8 @@ import { ServerToAllEvents } from "../../../services/socket/enums/SharedEvents";
 import { roomManager } from "../../../services/socket/roomManager";
 import axios from "axios";
 import AdminServices from "../../admin/services/adminServices";
+import { TeamType } from "../types/session";
+import { Team } from "../../players/models/team";
 
 export const createSession = async (
   req: Request,
@@ -17,7 +19,7 @@ export const createSession = async (
   next: NextFunction
 ) => {
   const { name, adminName, adminPin: password, gameConfig } = req.body;
-  const { gameSessionId, gameLink, gameServerUrl, gameAdminLink, gameLinked } =
+  const { gameSessionId, gameLink, gameServerUrl, gameAdminLink, gameLinked, teamType } =
     gameConfig;
 
   const adminService = new AdminServices();
@@ -31,6 +33,7 @@ export const createSession = async (
       gameServerUrl,
       gameAdminLink,
       gameLinked: gameLinked || false,
+      teamType,
       state: SessionStates.TEAM_JOINING,
     });
 

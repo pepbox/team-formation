@@ -42,29 +42,36 @@ const AdminLoginForm = () => {
           Admin Login
         </h2>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
-            Enter 4-digit PIN
-          </label>
-
-          <OTPInput
-            length={4}
-            value={pin}
-            onChange={handlePinChange}
-            onComplete={handlePinComplete}
-            autoFocus={true}
-            disabled={isLoading}
-            className="mb-4"
-          />
-        </div>
-
-        <button
-          onClick={handleLogin}
-          disabled={isLoading || pin.length !== 4}
-          className="w-full bg-[#111111] text-white py-3 px-4 rounded-2xl font-medium cursor-pointer transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
         >
-          {isLoading ? "Logging in..." : "Login"}
-        </button>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
+              Enter 4-digit PIN
+            </label>
+
+            <OTPInput
+              length={4}
+              value={pin}
+              onChange={handlePinChange}
+              onComplete={handlePinComplete}
+              autoFocus={true}
+              disabled={isLoading}
+              className="mb-4"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading || pin.length !== 4}
+            className="w-full bg-[#111111] text-white py-3 px-4 rounded-2xl font-medium cursor-pointer transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </button>
+        </form>
         {error && (
           <div className="mt-4 text-red-600 text-center">
             {"data" in error

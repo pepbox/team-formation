@@ -1,7 +1,7 @@
 import { API_TAGS } from "../../app/apiTags";
 import store from "../../app/store";
-import { authApi } from "../../features/user/auth/authApi";
-import { updateSession } from "../../features/session/sessionSlice";
+// import { authApi } from "../../features/user/auth/authApi";
+// import { updateSession } from "../../features/session/sessionSlice";
 import { playerApi } from "../../features/user/player/playerApi";
 import { ServerToAllEvents } from "./enums/SharedEvents";
 import { ServerToUserEvents } from "./enums/UserEvents";
@@ -13,9 +13,10 @@ import { throttle } from "../../utility/throttle";
 export const setupGlobalListeners = () => {
   websocketService.addGlobalListener(
     ServerToAllEvents.SESSION_UPDATE,
-    (data) => {
-      store.dispatch(authApi.endpoints.fetchPlayer.initiate(undefined));
-      store.dispatch(updateSession(data));
+    () => {
+      store.dispatch(sessionApi.util.invalidateTags([API_TAGS.SESSION]));
+      // store.dispatch(authApi.endpoints.fetchPlayer.initiate(undefined));
+      // store.dispatch(updateSession(data));
     },
     "redux"
   );

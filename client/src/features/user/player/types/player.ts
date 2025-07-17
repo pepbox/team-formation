@@ -15,4 +15,5 @@ export interface Player {
   teamNumber: string | null;
   teamMembers: TeamMember[] | null;
   teamLeaderId: string | null;
+  teamType: string; 
 }
