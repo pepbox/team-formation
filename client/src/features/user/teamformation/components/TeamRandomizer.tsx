@@ -481,7 +481,6 @@ function TeamRandomizer() {
           </div>
         </div>
 
-        <div className="text-white my-9">Prize Number {prizeNumber}</div>
         {/* Conditional rendering based on team formation type */}
         {teamType === "color" ? (
           // Wheel Component
