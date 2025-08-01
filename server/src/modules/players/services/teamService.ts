@@ -3,6 +3,7 @@ import { Team } from "../models/team";
 import { ITeam } from "../types/team";
 import { TEAM_COLORS } from "../../../utils/teamColors";
 import axios from "axios";
+import { TeamType } from "../../session/types/session";
 
 export default class TeamService {
   private session?: mongoose.ClientSession;
@@ -14,10 +15,11 @@ export default class TeamService {
   // Static methods for backward compatibility
   static async createNTeams(
     numberOfTeams: number,
-    sessionId: mongoose.Types.ObjectId | string
+    sessionId: mongoose.Types.ObjectId | string,
+    teamType: TeamType = TeamType.NUMBER
   ) {
     const service = new TeamService();
-    return service.createNTeams(numberOfTeams, sessionId);
+    return service.createNTeams(numberOfTeams, sessionId, teamType);
   }
 
   static async getTeamById(teamId: mongoose.Types.ObjectId | string) {
@@ -54,12 +56,13 @@ export default class TeamService {
 
   async createNTeams(
     numberOfTeams: number,
-    sessionId: mongoose.Types.ObjectId | string
+    sessionId: mongoose.Types.ObjectId | string,
+    teamType: TeamType = TeamType.NUMBER
   ) {
     const teamDocs = Array.from({ length: numberOfTeams }, (_, i) => ({
-      teamNumber: i + 1,
+      teamNumber:  i + 1 ,
       leaderId: null,
-      teamName: TEAM_COLORS[i].option,
+      teamColor: teamType === TeamType.COLOR ? TEAM_COLORS[i].option : undefined,
       sessionId,
     }));
     const payload = {

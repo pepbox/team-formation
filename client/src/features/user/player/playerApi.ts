@@ -24,6 +24,12 @@ const playerApi = api.injectEndpoints({
       }),
       invalidatesTags: [API_TAGS.TEAM_PLAYER_VOTES],
     }),
+    logoutPlayer: builder.mutation({
+      query: () => ({
+        url: "/user/player/logoutPlayer",
+        method: "POST",
+      }),
+    }),
     assignTeamName: builder.mutation({
       query: ({ teamName }) => ({
         url: "/user/player/assign-teamname",
@@ -59,6 +65,7 @@ export const {
   useLazyFetchMyTeamQuery,
   useFetchMyTeamQuery,
   useFetchMyTeamPlayerVotesQuery,
+  useLogoutPlayerMutation,
   useVoteForLeaderMutation,
   useAssignTeamNameMutation,
   useFetchAllTeamsQuery,

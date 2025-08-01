@@ -18,6 +18,7 @@ publicPlayerRouter.post(
 protectedPlayerRouter.get("/fetch", playerControllers.fetchPlayer);
 protectedPlayerRouter.get("/fetch-my-team", playerControllers.fetchMyTeam);
 protectedPlayerRouter.post("/vote-for-leader", playerControllers.voteForLeader);
+protectedPlayerRouter.post("/logoutPlayer", playerControllers.logoutPlayer);
 protectedPlayerRouter.get(
   "/fetch-teamplayers-votes",
   playerControllers.fetchMyTeamPlayerVotes
@@ -33,5 +34,6 @@ protectedPlayerRouter.get(
   "/fetch-particular-team",
   teamControllers.getTeamById
 );
+
 
 export { publicPlayerRouter, protectedPlayerRouter };

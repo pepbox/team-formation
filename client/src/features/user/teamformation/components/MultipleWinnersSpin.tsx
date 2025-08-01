@@ -46,7 +46,7 @@ const MultipleWinnersSpin: React.FC<MultipleWinnersSpinProps> = ({
       setTimeout(() => {
         setPrizeNumber(chosenWinnerIndex >= 0 ? chosenWinnerIndex : 0);
         setMustSpin(true);
-      }, 500);
+      }, 1000);
     }
   }, [winners, chosenWinner, chosenWinnerIndex]);
 
@@ -55,7 +55,7 @@ const MultipleWinnersSpin: React.FC<MultipleWinnersSpinProps> = ({
     // Navigate to captain page after spin finishes
     setTimeout(() => {
       navigate(`/user/${sessionId}/our-captain`, { replace: true });
-    }, 2000);
+    }, 3000);
   };
 
   if (!winners.length) {

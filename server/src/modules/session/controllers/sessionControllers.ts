@@ -114,6 +114,7 @@ export const startTeamFormation = async (
       const teamService = new TeamService(mongoSession);
 
       const players = await playerService.getPlayersBySessionId(sessionId);
+      const sessionDoc = await sessionService.fetchSessionById(sessionId);
 
       if (players.length < numberOfTeams) {
         throw new AppError(
@@ -122,7 +123,7 @@ export const startTeamFormation = async (
         );
       }
 
-      const teams = await teamService.createNTeams(numberOfTeams, sessionId);
+      const teams = await teamService.createNTeams(numberOfTeams, sessionId, sessionDoc.teamType);
 
       if (!teams || teams.length !== numberOfTeams) {
         throw new AppError("Failed to create teams.", 500);

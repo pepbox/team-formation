@@ -1,4 +1,7 @@
-import { useFetchMyTeamQuery } from "../../player/playerApi";
+import {
+  useFetchMyTeamQuery,
+  useLogoutPlayerMutation,
+} from "../../player/playerApi";
 import { useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../app/store";
 import { useEffect } from "react";
@@ -8,15 +11,34 @@ import TeamMemberCard from "./TeamMemberCard";
 import { SessionStates } from "../../../session/types/sessionStates";
 import { useNavigate } from "react-router-dom";
 import ContinueToGameButton from "./ContinueToGameButton";
+import { useFetchPlayerQuery } from "../../auth/authApi";
 
 const MyTeamList = () => {
   const { data } = useFetchMyTeamQuery(undefined);
+  const {data:playerData}=useFetchPlayerQuery(undefined);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { state, sessionId } = useSelector((state: RootState) => state.session);
-  const { teamMembers, teamName, teamNumber, teamLeaderId, _id } = useSelector(
-    (state: RootState) => state.player
-  );
+  const {
+    teamMembers,
+    teamName,
+    teamNumber,
+    teamLeaderId,
+    _id,
+    teamColor,
+    teamType,
+  } = useSelector((state: RootState) => state.player);
+  const [LogoutPlayer, { isLoading: isLoggingOut }] = useLogoutPlayerMutation();
+
+  const handleLogout = async () => {
+    try {
+      await LogoutPlayer(undefined).unwrap();
+      window.location.href = `${window.location.origin}/user/${sessionId}/login`;
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+  console.log("teamType:  ", teamType);
 
   useEffect(() => {
     dispatch(
@@ -26,9 +48,16 @@ const MyTeamList = () => {
         teamMembers: data?.data.teamPlayers || [],
       })
     );
-  }, [data]);
+  }, [data,playerData]);
 
   useEffect(() => {
+    console.log("useeffect rendered.", state);
+    console.log("teamName", teamName);
+    console.log("teamLeaderId", teamLeaderId);
+    console.log("_id", _id);
+    console.log("sessionId", sessionId);
+    console.log("teamColor", teamColor);
+    console.log("teamType", teamType);  
     if (
       state === SessionStates.FINAL &&
       [null, ""].includes(teamName) &&
@@ -44,6 +73,7 @@ const MyTeamList = () => {
         <div className="flex">
           <p className="text-[20px] font-bold font-mono text-white text-center self-center w-full">
             Team - {teamNumber?.toString().padStart(3, "0")}{" "}
+            {teamColor ? `(${teamColor})` : ""}{" "}
             {teamName ? `- ${teamName}` : null}
           </p>
         </div>
@@ -68,6 +98,17 @@ const MyTeamList = () => {
           </button>
         )}
         {state === SessionStates.COMPLETED && <ContinueToGameButton />}
+
+        {/* Logout Button */}
+        {state === SessionStates.FINAL && (
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex-1 bg-red-600 text-white py-2 h-[40px] rounded-[12px] text-center font-mono hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            {isLoggingOut ? "Logging out..." : "Logout"}
+          </button>
+        )}
       </div>
     </div>
   );

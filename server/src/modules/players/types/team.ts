@@ -6,4 +6,5 @@ export interface ITeam {
   teamName?: string | null;
   leaderId: mongoose.Types.ObjectId;
   sessionId: mongoose.Types.ObjectId;
+  teamColor?: string;
 }

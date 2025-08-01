@@ -157,6 +157,25 @@ export const fetchPlayer = async (
   }
 };
 
+export const logoutPlayer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+    res.status(200).json({
+      message: "Player logged out successfully.",
+    });
+  } catch (error) {
+    next(new AppError("Failed to logout player.", 500));
+  }
+};
+
 export const fetchMyTeam = async (
   req: Request,
   res: Response,

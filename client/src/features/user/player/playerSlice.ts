@@ -14,6 +14,7 @@ const initialState: Player = {
   teamMembers: null,
   teamLeaderId: null,
   teamType: "", // Added to store team type
+  teamColor: "",
 };
 
 const playerSlice = createSlice({
@@ -74,9 +75,29 @@ const playerSlice = createSlice({
             state.teamMembers = teamData.teamPlayers;
             state.teamName = teamData.teamInfo.teamName;
             state.teamLeaderId = teamData.teamInfo.leaderId;
+            state.teamColor = teamData.teamInfo.teamColor || "";
           }
         }
+      )
+      .addMatcher(
+        playerApi.endpoints.logoutPlayer.matchFulfilled,
+        (state) => {
+          // Clear all player data on successful logout
+          state._id = "";
+          state.firstName = "";
+          state.lastName = "";
+          state.profileImage = null;
+          state.teamName = "";
+          state.votedLeader = null;
+          state.teamNumber = null;
+          // state.teamMembers = null;
+          state.teamLeaderId = null;
+          state.teamType = "";
+          state.teamColor = "";
+        }
       );
+
+
   },
 });
 

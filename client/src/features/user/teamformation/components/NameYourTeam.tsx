@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useAssignTeamNameMutation } from "../../player/playerApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../app/store";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const NameYourTeam = () => {
+  const navigate= useNavigate();
   const [teamName, setTeamName] = useState("");
   const { sessionId } = useSelector((state: RootState) => state.session);
   const {teamName:stateTeamName}=useSelector((state:RootState)=>state.player);
@@ -28,7 +29,7 @@ const NameYourTeam = () => {
       style={{ minHeight: `${window.innerHeight}px` }}
     >
       <div className="flex flex-col gap-3">
-        <h1 className="font-bold text-[24px] font-mono text-white text-center">
+        <h1 onClick={()=>navigate(`/user/${sessionId}/my-team`)} className="font-bold text-[24px] font-mono text-white text-center">
           Name your Team
         </h1>
         <p className="text-white text-[12px] text-center tracking-wider font-mono">

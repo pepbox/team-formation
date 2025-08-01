@@ -7,6 +7,7 @@ const teamSchema = new Schema<ITeam>(
     teamName: { type: String, default: null },
     sessionId: { type: Schema.Types.ObjectId, ref: "Session", required: true },
     leaderId: { type: Schema.Types.ObjectId, ref: "Player" },
+    teamColor: { type: String, default: null },
   },
   {
     timestamps: true,
