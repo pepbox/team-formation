@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Session } from "../models/session";
 import { ISession } from "../types/session";
 import { SessionStates } from "../types/sessionStates";
+import VotingService from "../../voting/services/votingService";
 
 export default class SessionService {
   private session?: mongoose.ClientSession;
@@ -70,5 +71,11 @@ export default class SessionService {
       throw new Error("Session not found");
     }
     return sessionDoc;
+  }
+
+  // Add this method to SessionService class
+  async startVotingWithTimers(sessionId: string, votingDuration: number) {
+    const votingService = new VotingService();
+    await votingService.createVotingTimers(sessionId, votingDuration);
   }
 }

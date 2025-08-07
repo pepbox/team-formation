@@ -11,6 +11,8 @@ import notFoundMiddleware from "./middlewares/notFound";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { initializeSocket } from "./services/socket/index";
+import ChangeStreamManager from "./services/changeStreams/changeStreams";
+import mongoose from "mongoose";
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
@@ -56,6 +58,20 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging")
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
+const changeStreamManager = new ChangeStreamManager();
+
+// Add this after your database connection is established
+mongoose.connection.once('open', async () => {
+  console.log('Connected to MongoDB');
+  await changeStreamManager.initializeAll();
+});
+
+// Handle graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('Shutting down gracefully...');
+  await changeStreamManager.closeAll();
+  process.exit(0);
+});
 const args = process.argv.slice(2);
 const portArgIndex = args.indexOf("--port");
 
@@ -64,7 +80,8 @@ const PORT =
     ? Number(args[portArgIndex + 1])
     : Number(process.env.PORT) || 5000;
 
-    
+
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Socket.IO server initialized and running`);

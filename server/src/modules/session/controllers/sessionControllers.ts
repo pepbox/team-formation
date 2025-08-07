@@ -218,6 +218,9 @@ export const startLeaderVoting = async (
       votingStartTime: new Date(),
     });
 
+    console.log("Starting leader voting with duration:", votingDuration);
+    await sessionService.startVotingWithTimers(sessionId, votingDuration);
+
     SessionEmitters.toSession(sessionId, ServerToAllEvents.SESSION_UPDATE, {
       state: SessionStates.LEADER_VOTING,
       votingStartTime: updatedSession.votingStartTime,
@@ -233,6 +236,7 @@ export const startLeaderVoting = async (
     if (error instanceof AppError) {
       return next(error);
     }
+    next(new AppError("Failed to start leader voting.", 500));
   }
 };
 

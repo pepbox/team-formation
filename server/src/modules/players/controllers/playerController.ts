@@ -342,52 +342,44 @@ export const fetchMyTeamPlayerVotes = async (
     };
 
     if (isVotingEnded) {
-      const maxVotes = Math.max(...teamPlayersWithVotes.map((p) => p.votes));
-      const winners = teamPlayersWithVotes.filter((p) => p.votes === maxVotes);
       const team = await teamService.getTeamById(player.teamId);
 
       if (!team) {
         return next(new AppError("Team not found.", 404));
       }
 
-      let chosenLeader = null;
+      // If winners are already calculated and stored, use them
+      if (team.winners && team.winners.length > 0 && team.leaderId) {
+        const maxVotes = Math.max(...team.winners.map(w => w.votes));
+        const chosenLeader = team.winners.find(w =>
+          w._id.toString() === team.leaderId?.toString()
+        ) || team.winners[0];
 
-      if (!team.leaderId) {
-        const randomIndex = Math.floor(Math.random() * winners.length);
-        chosenLeader = winners[randomIndex];
-        await teamService.updateTeam(team._id, {
-          leaderId: chosenLeader._id,
-        });
-        if (session.state !== SessionStates.FINAL) {
-          await sessionService.updateSessionById(sessionId, {
-            state: SessionStates.FINAL,
-          });
-        }
-
-        SessionEmitters.toSession(sessionId, ServerToAllEvents.SESSION_UPDATE, {
-          state: SessionStates.FINAL,
-        });
+        responseData = {
+          ...responseData,
+          winners: team.winners,
+          chosenLeader,
+          maxVotes,
+          leaderAlreadyAssigned: true,
+        };
+        console.log("Winners already calculated:", team.winners);
       } else {
-        chosenLeader =
-          winners.find((w) => w._id.toString() === team.leaderId.toString()) ||
-          winners[0];
-      }
+        console.log("Calculating winners based on votes...");
+        // Fallback to old logic if winners not yet calculated
+        const maxVotes = Math.max(...teamPlayersWithVotes.map((p) => p.votes));
+        const winners = teamPlayersWithVotes.filter((p) => p.votes === maxVotes);
 
-      responseData = {
-        ...responseData,
-        winners: winners.map((w) => ({
-          _id: w._id,
-          name: w.firstName + " " + w.lastName,
-          votes: w.votes,
-        })),
-        chosenLeader: {
-          _id: chosenLeader._id,
-          name: chosenLeader.firstName + " " + chosenLeader.lastName,
-          votes: chosenLeader.votes,
-        },
-        maxVotes,
-        leaderAlreadyAssigned: !!team.leaderId,
-      };
+        responseData = {
+          ...responseData,
+          winners: winners.map((w) => ({
+            _id: w._id,
+            name: w.firstName + " " + w.lastName,
+            votes: w.votes,
+          })),
+          maxVotes,
+          leaderAlreadyAssigned: false,
+        };
+      }
     }
 
     res.status(200).json({
@@ -401,7 +393,6 @@ export const fetchMyTeamPlayerVotes = async (
     next(new AppError("Failed to fetch team players votes.", 500));
   }
 };
-
 export const continueToGame = async (
   req: Request,
   res: Response,

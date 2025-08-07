@@ -8,6 +8,11 @@ const teamSchema = new Schema<ITeam>(
     sessionId: { type: Schema.Types.ObjectId, ref: "Session", required: true },
     leaderId: { type: Schema.Types.ObjectId, ref: "Player" },
     teamColor: { type: String, default: null },
+    winners: [{
+      _id: { type: Schema.Types.ObjectId, ref: "Player" },
+      name: { type: String },
+      votes: { type: Number }
+    }],
   },
   {
     timestamps: true,
