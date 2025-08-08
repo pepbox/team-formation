@@ -74,8 +74,8 @@ export default class SessionService {
   }
 
   // Add this method to SessionService class
-  async startVotingWithTimers(sessionId: string, votingDuration: number) {
+  async startVotingWithTimers(sessionId: string,startTime:Date, votingDuration: number) {
     const votingService = new VotingService();
-    await votingService.createVotingTimers(sessionId, votingDuration);
+    await votingService.createVotingTimers(sessionId, startTime, votingDuration);
   }
 }

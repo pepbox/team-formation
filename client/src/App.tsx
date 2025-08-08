@@ -15,6 +15,7 @@ const App: React.FC = () => {
   const { isAuthenticated: isAdminAuthenticated } = useSelector(
     (state: RootState) => state.adminAuth
   );
+  
   useEffect(() => {
     const initWS = async () => {
       try {

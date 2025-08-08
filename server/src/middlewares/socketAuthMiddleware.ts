@@ -1,5 +1,4 @@
 import { Socket } from "socket.io";
-import jwt from "jsonwebtoken";
 import { verifyAccessToken } from "../utils/jwtUtils";
 
 export const socketAuthMiddleware = (

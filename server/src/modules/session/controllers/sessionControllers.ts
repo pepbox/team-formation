@@ -212,14 +212,17 @@ export const startLeaderVoting = async (
     if (session.state !== SessionStates.TEAM_FORMATION) {
       return next(new AppError("Session is not in team formation state.", 400));
     }
+
+    const startTime = new Date();
+    
     const updatedSession = await sessionService.updateSessionById(sessionId, {
       state: SessionStates.LEADER_VOTING,
       votingDuration: votingDuration || 120,
-      votingStartTime: new Date(),
+      votingStartTime: startTime,
     });
 
     console.log("Starting leader voting with duration:", votingDuration);
-    await sessionService.startVotingWithTimers(sessionId, votingDuration);
+    await sessionService.startVotingWithTimers(sessionId,startTime, votingDuration);
 
     SessionEmitters.toSession(sessionId, ServerToAllEvents.SESSION_UPDATE, {
       state: SessionStates.LEADER_VOTING,
