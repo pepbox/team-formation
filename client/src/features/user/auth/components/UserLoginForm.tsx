@@ -1,5 +1,6 @@
-import { ImageUp } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { ImageUp, Camera, Upload, X } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import Webcam from "react-webcam";
 import { useCreateUserMutation } from "../authApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../app/store";
@@ -12,21 +13,76 @@ function LoginForm() {
   const [lastName, setLastName] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const webcamRef = useRef<Webcam>(null);
   const { sessionId } = useSelector((state: RootState) => state.session);
   const [createUser, { isLoading, error, isSuccess }] = useCreateUserMutation();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setProfilePicture(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      // Create preview URL for uploaded file
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setPreviewUrl(e.target.result as string);
+          setProfilePicture(file);
+          setShowOptions(false);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleImageUploadClick = () => {
+    setShowOptions(true);
+  };
+
+  const handleUploadFromGallery = () => {
     fileInputRef.current?.click();
+  };
+
+  const startCamera = () => {
+    setShowCamera(true);
+    setShowOptions(false);
+  };
+
+  const stopCamera = () => {
+    setShowCamera(false);
+    setCapturedImage(null);
+  };
+
+  const capturePhoto = useCallback(() => {
+    const imageSrc = webcamRef.current?.getScreenshot();
+    if (imageSrc) {
+      setCapturedImage(imageSrc);
+    }
+  }, [webcamRef]);
+
+  const confirmPhoto = async () => {
+    if (!capturedImage) return;
+
+    try {
+      // Convert base64 to File object
+      const response = await fetch(capturedImage);
+      const blob = await response.blob();
+      const file = new File([blob], "camera-photo.jpg", {
+        type: "image/jpeg",
+      });
+
+      setProfilePicture(file);
+      setPreviewUrl(capturedImage);
+      stopCamera();
+    } catch (error) {
+      console.error("Error preparing image data:", error);
+    }
+  };
+
+  const retakePhoto = () => {
+    setCapturedImage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +106,7 @@ function LoginForm() {
 
   useEffect(() => {
     return () => {
-      if (previewUrl) {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
         URL.revokeObjectURL(previewUrl);
       }
     };
@@ -98,6 +154,110 @@ function LoginForm() {
             <h1 className="font-bold text-[12px] text-white tracking-widest">
               Upload your Selfie
             </h1>
+
+            {/* Options Modal */}
+            {showOptions && (
+              <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                <div className="bg-[#111111] rounded-[16px] p-6 flex flex-col gap-4 shadow-lg">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-white font-mono text-[14px] font-bold">
+                      Choose Option
+                    </h2>
+                    <button
+                      onClick={() => setShowOptions(false)}
+                      className="text-white hover:text-gray-300"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={startCamera}
+                    className="flex items-center gap-3 bg-[#1E89E0] text-white px-4 py-3 rounded-[8px] hover:bg-[#1E89E0]/80 transition-colors"
+                  >
+                    <Camera size={20} />
+                    <span className="font-mono text-[12px]">Take Photo</span>
+                  </button>
+
+                  <button
+                    onClick={handleUploadFromGallery}
+                    className="flex items-center gap-3 bg-[#1E89E0] text-white px-4 py-3 rounded-[8px] hover:bg-[#1E89E0]/80 transition-colors"
+                  >
+                    <Upload size={20} />
+                    <span className="font-mono text-[12px]">
+                      Upload from Gallery
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Camera Modal */}
+            {showCamera && (
+              <div className="fixed inset-0 bg-black/90 flex justify-center items-center z-50">
+                <div className="bg-[#111111] rounded-[16px] p-6 flex flex-col gap-4 shadow-lg max-w-sm w-full mx-4">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-white font-mono text-[14px] font-bold">
+                      Take Your Selfie
+                    </h2>
+                    <button
+                      onClick={stopCamera}
+                      className="text-white hover:text-gray-300"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    {capturedImage ? (
+                      <img
+                        src={capturedImage}
+                        alt="Captured"
+                        className="w-full h-[300px] object-cover rounded-[12px]"
+                      />
+                    ) : (
+                      <Webcam
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        width={320}
+                        height={300}
+                        className="w-full h-[300px] object-cover rounded-[12px]"
+                        videoConstraints={{
+                          width: 640,
+                          height: 480,
+                          facingMode: "user",
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {capturedImage ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={retakePhoto}
+                        className="flex-1 bg-gray-600 text-white px-4 py-3 rounded-[12px] hover:bg-gray-700 transition-colors font-mono text-[12px]"
+                      >
+                        Retake
+                      </button>
+                      <button
+                        onClick={confirmPhoto}
+                        className="flex-1 bg-[#1E89E0] text-white px-4 py-3 rounded-[12px] hover:bg-[#1E89E0]/80 transition-colors font-mono text-[12px]"
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={capturePhoto}
+                      className="bg-[#1E89E0] text-white px-4 py-3 rounded-[12px] hover:bg-[#1E89E0]/80 transition-colors font-mono text-[12px]"
+                    >
+                      Capture Photo
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-[15px]">

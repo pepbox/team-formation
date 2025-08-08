@@ -35,7 +35,7 @@ const AllTeamsList = () => {
             <div className="flex items-center gap-3">
               <div className="w-[48px] h-[48px] rounded-full bg-[#EBFF7C] overflow-hidden"></div>
               <p className="font-bold text-[14px] font-mono">
-                Team - {item.teamNumber} - {item.teamName}
+                Team - {item.teamNumber} - {item.teamColor} - {item.teamName}
               </p>
             </div>
             <ArrowForward />

@@ -23,22 +23,36 @@ const MultipleWinnersSpin: React.FC<MultipleWinnersSpinProps> = ({
 
   // Generate multiple colors for the wheel segments
   const segmentColors = [
-    "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
-    "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9",
-    "#F8C471", "#82E0AA", "#F1948A", "#AED6F1", "#D2B4DE"
+    "#FF6B6B",
+    "#4ECDC4",
+    "#45B7D1",
+    "#96CEB4",
+    "#FFEAA7",
+    "#DDA0DD",
+    "#98D8C8",
+    "#F7DC6F",
+    "#BB8FCE",
+    "#85C1E9",
+    "#F8C471",
+    "#82E0AA",
+    "#F1948A",
+    "#AED6F1",
+    "#D2B4DE",
   ];
 
   // Prepare data for the wheel
   const data = winners.map((winner, index) => ({
     option: winner.name,
-    style: { 
+    style: {
       backgroundColor: segmentColors[index % segmentColors.length],
-      textColor: "#FFFFFF"
-    }
+      textColor: "#FFFFFF",
+    },
   }));
 
   // Find the index of the chosen winner
-  const chosenWinnerIndex = winners.findIndex(winner => winner.id === chosenWinner);
+  const chosenWinnerIndex = winners.findIndex(
+    (winner) => winner.id === chosenWinner
+  );
 
   useEffect(() => {
     if (winners.length > 0 && chosenWinner) {
@@ -69,9 +83,7 @@ const MultipleWinnersSpin: React.FC<MultipleWinnersSpinProps> = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/90 z-50">
       <div className="flex flex-col items-center space-y-6">
-        <h2 className="text-white text-2xl font-bold mb-4">
-          Its a Tie 
-        </h2>
+        <h2 className="text-white text-2xl font-bold mb-4">Its a Tie</h2>
         <div className="relative">
           <Wheel
             mustStartSpinning={mustSpin}

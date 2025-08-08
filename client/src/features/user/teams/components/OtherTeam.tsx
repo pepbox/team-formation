@@ -17,7 +17,8 @@ const OtherTeam = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  const { players, teamName, teamNumber, leaderId, _id } = data?.data;
+  const { players, teamName, teamNumber, leaderId, _id, teamColor } =
+    data?.data;
 
   console.log("OtherTeam data", data.data);
   console.log("LeaderId", leaderId);
@@ -33,6 +34,7 @@ const OtherTeam = () => {
           </button>
           <p className="text-[20px] font-bold font-mono text-white text-center self-center w-full">
             Team - {teamNumber?.toString().padStart(3, "0")}{" "}
+            {teamColor ? `- ${teamColor}` : null}{" "}
             {teamName ? `- ${teamName}` : null}
           </p>
         </div>

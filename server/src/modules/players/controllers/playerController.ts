@@ -362,10 +362,7 @@ export const fetchMyTeamPlayerVotes = async (
           maxVotes,
           leaderAlreadyAssigned: true,
         };
-        console.log("Winners already calculated:", team.winners);
       } else {
-        console.log("Calculating winners based on votes...");
-        // Fallback to old logic if winners not yet calculated
         const maxVotes = Math.max(...teamPlayersWithVotes.map((p) => p.votes));
         const winners = teamPlayersWithVotes.filter((p) => p.votes === maxVotes);
 

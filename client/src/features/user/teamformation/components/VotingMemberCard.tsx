@@ -40,8 +40,8 @@ const VotingMemberCard: React.FC<VotingMemberCardProps> = ({
         <p className="text-white">{votes}</p>
         <button
           className={`w-[52px] h-[33px] text-[14px] rounded-[12px] text-white transition-colors ${
-            myVoted || disabled 
-              ? "bg-gray-400 cursor-not-allowed" 
+            myVoted || disabled
+              ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#1E89E0] hover:bg-[#1670c7]"
           }`}
           onClick={onVote}

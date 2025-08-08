@@ -316,7 +316,7 @@ function TeamRandomizer() {
               <span className="text-green-400 font-bold font-mono text-sm">
                 SPIN COMPLETE!
               </span>
-              <span className="text-blue-400 font-bold font-mono text-xs">
+              <span className="text-blue-400 font-bold font-mono text-xs text-wrap">
                 Redirecting to your team in {countdown}...
               </span>
             </div>
@@ -333,7 +333,7 @@ function TeamRandomizer() {
             </div>
           ) : (
             <span className="text-gray-400 font-bold font-mono text-sm">
-              READY TO SPIN
+              {teamType === "color" ? "READY TO SPIN" : "Pull the lever"}
             </span>
           )}
         </div>
