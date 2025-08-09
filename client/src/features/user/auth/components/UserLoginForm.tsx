@@ -152,7 +152,7 @@ function LoginForm() {
             />
 
             <h1 className="font-bold text-[12px] text-white tracking-widest">
-              Upload your Selfie
+              Upload/Click your Selfie
             </h1>
 
             {/* Options Modal */}

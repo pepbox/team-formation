@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.use("/user", userRoutes);
 router.use("/admin", adminRoutes);
-router.use("/common",commonRoutes)
+router.use("/common",commonRoutes);
 
 router.use("/server",serverRoutes);
 
