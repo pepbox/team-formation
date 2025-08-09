@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Session } from "../models/session";
 import { ISession } from "../types/session";
 import { SessionStates } from "../types/sessionStates";
-import VotingService from "../../voting/services/votingService";
+import VotingManager from "../../../services/voting/VotingManager";
 
 export default class SessionService {
   private session?: mongoose.ClientSession;
@@ -74,8 +74,14 @@ export default class SessionService {
   }
 
   // Add this method to SessionService class
-  async startVotingWithTimers(sessionId: string,startTime:Date, votingDuration: number) {
-    const votingService = new VotingService();
-    await votingService.createVotingTimers(sessionId, startTime, votingDuration);
+  async startVotingWithTimers(sessionId: string, votingDuration: number) {
+    try {
+      console.log(`Starting voting timers for session ${sessionId} with duration ${votingDuration}s`);
+      const votingManager = VotingManager.getInstance();
+      await votingManager.startVoting(sessionId, votingDuration);
+    } catch (error) {
+      console.error("Error starting voting timers:", error);
+      throw error;
+    }
   }
 }

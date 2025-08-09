@@ -1,0 +1,19 @@
+{
+  "name": "team-formation-load-tests",
+  "version": "1.0.0",
+  "description": "Load testing suite for team formation system",
+  "scripts": {
+    "test:load": "artillery run load-test.yml",
+    "test:stress": "artillery run stress-test.yml",
+    "test:basic": "artillery run basic-test.yml",
+    "test:voting": "artillery run voting-test.yml",
+    "setup": "npm install",
+    "clean": "node scripts/cleanup.js"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.0",
+    "axios": "^1.6.0",
+    "socket.io-client": "^4.7.0",
+    "mongodb": "^6.0.0"
+  }
+}

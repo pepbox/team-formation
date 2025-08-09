@@ -1,0 +1,119 @@
+config:
+  target: 'http://localhost:5000'
+  phases:
+    # Quick ramp-up to stress test the voting system
+    - duration: 10
+      arrivalRate: 10
+      name: "Fast ramp-up"
+    # Sustain high load during voting
+    - duration: 45
+      arrivalRate: 0
+      maxVusers: 100
+      name: "Voting stress test"
+  variables:
+    sessionId: ""
+
+before:
+  flow:
+    - log: "Starting Voting Stress Test"
+
+scenarios:
+  # Pre-setup: Create session and teams
+  - name: "Setup Session"
+    weight: 1
+    flow:
+      - post:
+          url: "/api/v1/admin/login"
+          headers:
+            Content-Type: "application/json"
+          json:
+            sessionId: "stress-{{ $randomString() }}"
+            password: "admin123"
+          capture:
+            - header: "set-cookie"
+              as: "adminCookie"
+      
+      - post:
+          url: "/api/v1/server/create-session"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            name: "Stress Test Session"
+            adminName: "Stress Admin"
+            adminPin: "admin123"
+            gameConfig:
+              gameSessionId: "stress-{{ $randomString() }}"
+              gameLink: "http://localhost:3000"
+              gameServerUrl: "http://localhost:3000"
+              gameAdminLink: "http://localhost:3000/admin"
+              gameLinked: false
+              teamType: "RANDOM"
+          capture:
+            - json: "$.data.sessionId"
+              as: "sessionId"
+      
+      - post:
+          url: "/api/v1/admin/session/start-team-formation"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            numberOfTeams: 10
+      
+      - think: 5
+      
+      - post:
+          url: "/api/v1/admin/session/start-leader-voting"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            votingDuration: 30
+
+  # Stress test players - rapid voting
+  - name: "Stress Voting"
+    weight: 99
+    flow:
+      # Quick registration
+      - post:
+          url: "/api/v1/user/player/create"
+          headers:
+            Content-Type: "application/json"
+          json:
+            firstName: "Stress{{ $randomString() }}"
+            lastName: "User{{ $randomNumber(1, 10000) }}"
+            sessionId: "{{ sessionId }}"
+          capture:
+            - header: "set-cookie"
+              as: "playerCookie"
+      
+      # Get team info rapidly
+      - get:
+          url: "/api/v1/user/player/fetch-my-team"
+          headers:
+            Cookie: "{{ playerCookie }}"
+          capture:
+            - json: "$.data.teamPlayers[0]._id"
+              as: "teammateId"
+      
+      # Rapid-fire voting (simulate users changing votes)
+      - loop:
+          - post:
+              url: "/api/v1/user/player/vote-for-leader"
+              headers:
+                Content-Type: "application/json"
+                Cookie: "{{ playerCookie }}"
+              json:
+                votedLeaderId: "{{ teammateId }}"
+          - think: "{{ $randomNumber(1, 3) }}"
+        count: 3
+      
+      # Constantly check voting status
+      - loop:
+          - get:
+              url: "/api/v1/user/player/fetch-teamplayers-votes"
+              headers:
+                Cookie: "{{ playerCookie }}"
+          - think: 1
+        count: 20

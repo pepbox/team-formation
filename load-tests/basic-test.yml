@@ -1,0 +1,51 @@
+config:
+  target: 'http://localhost:5000'
+  phases:
+    - duration: 60
+      arrivalRate: 2
+      name: "Basic functionality test"
+  http:
+    timeout: 10
+
+scenarios:
+  - name: "Basic Health Check"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/v1/health"
+          expect:
+            - statusCode: [200, 404]  # Accept 404 if health endpoint doesn't exist
+
+  - name: "Session Creation Test"
+    weight: 80
+    flow:
+      # Test session creation
+      - post:
+          url: "/api/v1/admin/login"
+          headers:
+            Content-Type: "application/json"
+          json:
+            sessionId: "test-{{ $randomString() }}"
+            password: "admin123"
+          capture:
+            - header: "set-cookie"
+              as: "adminCookie"
+      
+      - post:
+          url: "/api/v1/server/create-session"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            name: "Basic Test Session"
+            adminName: "Test Admin"
+            adminPin: "admin123"
+            gameConfig:
+              gameSessionId: "basic-test-{{ $randomString() }}"
+              gameLink: "http://localhost:3000"
+              gameServerUrl: "http://localhost:3000"
+              gameAdminLink: "http://localhost:3000/admin"
+              gameLinked: false
+              teamType: "RANDOM"
+          expect:
+            - statusCode: 201

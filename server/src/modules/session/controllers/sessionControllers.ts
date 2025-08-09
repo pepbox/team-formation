@@ -222,7 +222,7 @@ export const startLeaderVoting = async (
     });
 
     console.log("Starting leader voting with duration:", votingDuration);
-    await sessionService.startVotingWithTimers(sessionId,startTime, votingDuration);
+    await sessionService.startVotingWithTimers(sessionId, votingDuration);
 
     SessionEmitters.toSession(sessionId, ServerToAllEvents.SESSION_UPDATE, {
       state: SessionStates.LEADER_VOTING,

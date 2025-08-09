@@ -1,0 +1,155 @@
+config:
+  target: 'http://localhost:5000'
+  phases:
+    # Ramp up phase: 100 users over 30 seconds
+    - duration: 30
+      arrivalRate: 3
+      name: "Warm up"
+    # Main load phase: Hold 100 concurrent users
+    - duration: 120
+      arrivalRate: 0
+      maxVusers: 100
+      name: "Full load test"
+  http:
+    timeout: 30
+  payload:
+    path: './test-data'
+  variables:
+    testSessionId: ""
+    adminToken: ""
+
+before:
+  flow:
+    - log: "Starting Team Formation Load Test - 100 Users"
+    - log: "Target: http://localhost:5000"
+
+scenarios:
+  # Admin scenario - runs once to set up session
+  - name: "Admin Setup"
+    weight: 1
+    flow:
+      - post:
+          url: "/api/v1/admin/login"
+          headers:
+            Content-Type: "application/json"
+          json:
+            sessionId: "{{ $randomString() }}"
+            password: "admin123"
+          capture:
+            - json: "$.data.sessionId"
+              as: "sessionId"
+            - header: "set-cookie"
+              as: "adminCookie"
+      
+      - post:
+          url: "/api/v1/server/create-session"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            name: "Load Test Session"
+            adminName: "Load Test Admin"
+            adminPin: "admin123"
+            gameConfig:
+              gameSessionId: "load-test-{{ $randomString() }}"
+              gameLink: "http://localhost:3000"
+              gameServerUrl: "http://localhost:3000"
+              gameAdminLink: "http://localhost:3000/admin"
+              gameLinked: false
+              teamType: "RANDOM"
+          capture:
+            - json: "$.data.sessionId"
+              as: "testSessionId"
+      
+      - think: 5
+      
+      # Start team formation (10 teams for 100 players)
+      - post:
+          url: "/api/v1/admin/session/start-team-formation"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            numberOfTeams: 10
+      
+      - think: 10
+      
+      # Start leader voting (30 second duration)
+      - post:
+          url: "/api/v1/admin/session/start-leader-voting"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+          json:
+            votingDuration: 30
+      
+      - think: 35  # Wait for voting to complete
+      
+      # Finish session
+      - post:
+          url: "/api/v1/admin/session/finish-session"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ adminCookie }}"
+
+  # Player scenario - simulates normal user flow
+  - name: "Player Journey"
+    weight: 99
+    flow:
+      - think: "{{ $randomNumber(1, 5) }}"  # Stagger arrivals
+      
+      # Player registration
+      - post:
+          url: "/api/v1/user/player/create"
+          headers:
+            Content-Type: "application/json"
+          json:
+            firstName: "Player{{ $randomString() }}"
+            lastName: "Test{{ $randomNumber(1, 1000) }}"
+            sessionId: "{{ testSessionId }}"
+          capture:
+            - json: "$.data.player._id"
+              as: "playerId"
+            - header: "set-cookie"
+              as: "playerCookie"
+          expect:
+            - statusCode: 201
+      
+      # Wait for team formation
+      - think: 15
+      
+      # Fetch my team
+      - get:
+          url: "/api/v1/user/player/fetch-my-team"
+          headers:
+            Cookie: "{{ playerCookie }}"
+          capture:
+            - json: "$.data.teamPlayers[0]._id"
+              as: "teammateId"
+      
+      # Wait for voting to start
+      - think: 10
+      
+      # Vote for a random teammate
+      - post:
+          url: "/api/v1/user/player/vote-for-leader"
+          headers:
+            Content-Type: "application/json"
+            Cookie: "{{ playerCookie }}"
+          json:
+            votedLeaderId: "{{ teammateId }}"
+          expect:
+            - statusCode: 200
+      
+      # Check voting progress multiple times
+      - loop:
+          - get:
+              url: "/api/v1/user/player/fetch-teamplayers-votes"
+              headers:
+                Cookie: "{{ playerCookie }}"
+          - think: 2
+        count: 5
+
+after:
+  flow:
+    - log: "Load test completed"

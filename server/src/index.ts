@@ -11,7 +11,7 @@ import notFoundMiddleware from "./middlewares/notFound";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { initializeSocket } from "./services/socket/index";
-import ChangeStreamManager from "./services/changeStreams/changeStreams";
+import VotingManager from "./services/voting/VotingManager";
 import mongoose from "mongoose";
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
@@ -58,18 +58,18 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging")
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
-const changeStreamManager = new ChangeStreamManager();
+const votingManager = VotingManager.getInstance();
 
-// Add this after your database connection is established
+// Initialize VotingManager and restore sessions after database connection
 mongoose.connection.once('open', async () => {
   console.log('Connected to MongoDB');
-  await changeStreamManager.initializeAll();
+  await votingManager.restoreVotingSessions();
 });
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
   console.log('Shutting down gracefully...');
-  await changeStreamManager.closeAll();
+  await mongoose.connection.close();
   process.exit(0);
 });
 const args = process.argv.slice(2);
