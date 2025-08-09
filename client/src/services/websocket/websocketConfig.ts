@@ -34,6 +34,14 @@ export const setupGlobalListeners = () => {
     "redux"
   );
 
+  websocketService.addGlobalListener(
+    ServerToUserEvents.TEAMS_UPDATE,
+    throttle(() => {
+      store.dispatch(sessionApi.util.invalidateTags([API_TAGS.ALL_TEAMS]));
+    },0),
+    "redux"
+  );
+
   
 
   websocketService.addGlobalListener(

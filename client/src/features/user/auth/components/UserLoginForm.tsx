@@ -91,6 +91,11 @@ function LoginForm() {
       alert("Please fill in both first and last name");
       return;
     }
+    // Extra validation: disallow digits in names
+    if (/\d/.test(firstName) || /\d/.test(lastName)) {
+      alert("Names cannot contain numbers");
+      return;
+    }
     try {
       const userData = {
         firstName: firstName.trim(),
@@ -264,21 +269,32 @@ function LoginForm() {
             <input
               type="text"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e) => {
+                // Strip any digits user may try to input
+                const cleaned = e.target.value.replace(/\d+/g, "");
+                setFirstName(cleaned);
+              }}
               placeholder="Enter your First Name"
               className="h-[40px] w-[100%] bg-[#D8FEFF]/90 rounded-[4px] pl-3 font-mono text-[12px]"
               disabled={isLoading}
               required
+              pattern="^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$"
+              title="Only letters, spaces, apostrophes and hyphens are allowed"
             />
 
             <input
               type="text"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => {
+                const cleaned = e.target.value.replace(/\d+/g, "");
+                setLastName(cleaned);
+              }}
               placeholder="Enter your Last Name"
               className="h-[40px] w-[100%] bg-[#D8FEFF]/90 rounded-[4px] pl-3 font-mono text-[12px]"
               disabled={isLoading}
               required
+              pattern="^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$"
+              title="Only letters, spaces, apostrophes and hyphens are allowed"
             />
 
             <button

@@ -8,6 +8,7 @@ const playerApi = api.injectEndpoints({
         url: "/user/player/fetch-my-team",
         method: "GET",
       }),
+      providesTags: [API_TAGS.ALL_TEAMS],
     }),
     fetchMyTeamPlayerVotes: builder.query({
       query: () => ({
@@ -44,6 +45,7 @@ const playerApi = api.injectEndpoints({
         url: "/user/player/fetch-all-teams",
         method: "GET",
       }),
+      providesTags: [API_TAGS.ALL_TEAMS],
     }),
     fetchParticularTeam: builder.query({
       query: (teamId) => ({

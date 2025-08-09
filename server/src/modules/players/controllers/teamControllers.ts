@@ -4,6 +4,7 @@ import TeamService from "../services/teamService";
 import AppError from "../../../utils/appError";
 import { SessionEmitters } from "../../../services/socket/sessionEmitters";
 import { ServerToAdminEvents } from "../../../services/socket/enums/AdminEvents";
+import { ServerToUserEvents } from "../../../services/socket/enums/UserEvents";
 
 export const assignTeamName = async (
   req: Request,
@@ -45,10 +46,18 @@ export const assignTeamName = async (
 
     const updatedTeam = await teamService.updateTeam(teamId, { teamName });
 
+    const sessionIdStr = updatedTeam.sessionId.toString();
+    // Notify admins
     SessionEmitters.toSessionAdmins(
-      updatedTeam.sessionId.toString(),
+      sessionIdStr,
       ServerToAdminEvents.TEAMS_UPDATE,
-      {}
+      { teamId: updatedTeam._id.toString(), teamName: updatedTeam.teamName }
+    );
+    // Notify all players in session (so their team lists refetch)
+    SessionEmitters.toSessionPlayers(
+      sessionIdStr,
+      ServerToUserEvents.TEAMS_UPDATE,
+      { teamId: updatedTeam._id.toString(), teamName: updatedTeam.teamName }
     );
     res.status(200).json({
       message: "Team name updated successfully",
