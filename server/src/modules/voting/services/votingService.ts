@@ -104,19 +104,6 @@ class VotingService {
         `Leader selected for team ${teamId}: ${chosenLeader.firstName} ${chosenLeader.lastName}`
       );
 
-      // Emit socket events for this team
-      SessionEmitters.toTeam(
-        sessionId,
-        teamId,
-        ServerToAllEvents.TEAM_LEADER_SELECTED,
-        {
-          teamId,
-          leaderId: chosenLeader._id,
-          leaderName: `${chosenLeader.firstName} ${chosenLeader.lastName}`,
-          winners: winnersData,
-        }
-      );
-
       // Check if all teams have leaders assigned
       await this.checkAndUpdateSessionState(sessionId);
     } catch (error) {

@@ -38,7 +38,7 @@ export const setupGlobalListeners = () => {
     ServerToUserEvents.TEAMS_UPDATE,
     throttle(() => {
       store.dispatch(sessionApi.util.invalidateTags([API_TAGS.ALL_TEAMS]));
-    },0),
+    }, 1000), // Proper 1s throttle to prevent spam
     "redux"
   );
 
@@ -56,6 +56,28 @@ export const setupGlobalListeners = () => {
     throttle(() => {
       store.dispatch(sessionApi.util.invalidateTags([API_TAGS.ALL_TEAMS]));
     }, 3000),
+    "redux"
+  );
+
+  // Listen for voting completion to trigger data refresh
+  websocketService.addGlobalListener(
+    ServerToAllEvents.VOTING_PROCESSING_COMPLETED,
+    () => {
+      store.dispatch(sessionApi.util.invalidateTags([API_TAGS.SESSION]));
+      store.dispatch(playerApi.util.invalidateTags([API_TAGS.TEAM_PLAYER_VOTES]));
+      store.dispatch(sessionApi.util.invalidateTags([API_TAGS.ALL_TEAMS]));
+    },
+    "redux"
+  );
+
+  // Handle voting processing errors
+  websocketService.addGlobalListener(
+    ServerToAllEvents.VOTING_PROCESSING_ERROR,
+    () => {
+      // Refresh data even on error to get current state
+      store.dispatch(sessionApi.util.invalidateTags([API_TAGS.SESSION]));
+      store.dispatch(playerApi.util.invalidateTags([API_TAGS.TEAM_PLAYER_VOTES]));
+    },
     "redux"
   );
 

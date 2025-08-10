@@ -21,7 +21,8 @@ const LeaderVoting = () => {
   );
   const [voteForLeader, { isLoading }] = useVoteForLeaderMutation();
   const { sessionId, state } = useSelector((state: RootState) => state.session);
-  const { data, refetch } = useFetchMyTeamPlayerVotesQuery(undefined);
+  // const { data, refetch } = useFetchMyTeamPlayerVotesQuery(undefined);
+  const { data } = useFetchMyTeamPlayerVotesQuery(undefined);
   const teamMembers = data?.data?.teamPlayersWithVotes || [];
 
   const handleVote = async (memberId: string) => {
@@ -36,7 +37,9 @@ const LeaderVoting = () => {
   };
 
   const handleTimerComplete = () => {
-    refetch();
+    // Timer complete - server will send VOTING_PROCESSING_COMPLETED event
+    // which will automatically trigger cache invalidation and refetch
+    console.log("Voting timer completed, waiting for server processing...");
   };
 
   useEffect(() => {
@@ -47,8 +50,7 @@ const LeaderVoting = () => {
           id: winner._id,
         }));
         setWinners(winnersList);
-      }
-      else{
+      } else {
         navigate(`/user/${sessionId}/our-captain`);
         return;
       }
@@ -66,7 +68,10 @@ const LeaderVoting = () => {
   return (
     <div className="p-4">
       {winners && (
-        <MultipleWinnersSpin winners={winners} chosenWinner={teamLeaderId ??""} />
+        <MultipleWinnersSpin
+          winners={winners}
+          chosenWinner={teamLeaderId ?? ""}
+        />
       )}
       <p className="text-[24px] mt-4 font-mono font-bold text-white text-center">
         Voting

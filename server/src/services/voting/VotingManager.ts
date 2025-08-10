@@ -6,7 +6,6 @@ interface VotingSession {
   sessionId: string;
   votingEndTime: Date;
   timer: NodeJS.Timeout;
-  countdownInterval: NodeJS.Timeout;
 }
 
 class VotingManager {
@@ -39,21 +38,12 @@ class VotingManager {
         await this.processVotingEnd(sessionId);
       }, votingDurationSeconds * 1000);
 
-      // Create countdown interval for real-time updates (every 500ms)
-      const countdownInterval = setInterval(() => {
-        this.sendCountdownUpdate(sessionId, votingEndTime);
-      }, 500);
-
       // Store the voting session
       this.activeVotingSessions.set(sessionId, {
         sessionId,
         votingEndTime,
         timer,
-        countdownInterval,
       });
-
-      // Send initial countdown
-      this.sendCountdownUpdate(sessionId, votingEndTime);
 
     } catch (error) {
       console.error(`Error starting voting for session ${sessionId}:`, error);
@@ -68,7 +58,6 @@ class VotingManager {
     const votingSession = this.activeVotingSessions.get(sessionId);
     if (votingSession) {
       clearTimeout(votingSession.timer);
-      clearInterval(votingSession.countdownInterval);
       this.activeVotingSessions.delete(sessionId);
       console.log(`Stopped voting for session ${sessionId}`);
     }
@@ -80,17 +69,6 @@ class VotingManager {
   private async processVotingEnd(sessionId: string): Promise<void> {
     try {
       console.log(`Processing voting end for session ${sessionId}`);
-
-      // Stop countdown updates
-      const votingSession = this.activeVotingSessions.get(sessionId);
-      if (votingSession) {
-        clearInterval(votingSession.countdownInterval);
-      }
-
-      // Notify users that processing has started
-      SessionEmitters.toSession(sessionId, ServerToAllEvents.VOTING_PROCESSING_STARTED, {
-        message: "Processing votes... Please wait.",
-      });
 
       // Import services dynamically to avoid circular dependencies
       const { default: TeamService } = await import("../../modules/players/services/teamService");
@@ -129,7 +107,7 @@ class VotingManager {
       // Clean up the voting session
       this.activeVotingSessions.delete(sessionId);
 
-      // Notify completion
+      // Notify completion - this triggers frontend refetch
       SessionEmitters.toSession(sessionId, ServerToAllEvents.VOTING_PROCESSING_COMPLETED, {
         processedTeams,
         failedTeams,
@@ -143,24 +121,10 @@ class VotingManager {
       
       // Clean up and notify error
       this.activeVotingSessions.delete(sessionId);
+      
+      // Notify error so frontend can handle it
       SessionEmitters.toSession(sessionId, ServerToAllEvents.VOTING_PROCESSING_ERROR, {
         error: "Failed to process votes. Please try again.",
-      });
-    }
-  }
-
-  /**
-   * Send countdown update to users
-   */
-  private sendCountdownUpdate(sessionId: string, votingEndTime: Date): void {
-    const now = new Date();
-    const timeRemaining = Math.max(0, votingEndTime.getTime() - now.getTime());
-    const secondsRemaining = Math.ceil(timeRemaining / 1000);
-
-    if (secondsRemaining > 0) {
-      SessionEmitters.toSession(sessionId, ServerToAllEvents.VOTING_COUNTDOWN_UPDATE, {
-        secondsRemaining,
-        timeRemaining,
       });
     }
   }
