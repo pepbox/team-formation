@@ -384,3 +384,56 @@ export const fetchAllTeams = async (
     next(new AppError("Failed to fetch teams.", 500));
   }
 };
+
+export const updateSession = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { sessionId, name, adminName, adminPin } = req.body;
+
+    if (!sessionId) {
+      return next(new AppError("Session ID is required.", 400));
+    }
+
+    const sessionService = new SessionService();
+    
+    // Check if session exists
+    const session = await sessionService.fetchSessionById(sessionId);
+    if (!session) {
+      return next(new AppError("Session not found.", 404));
+    }
+
+    // Prepare update data
+    const updateData: any = {};
+    if (name) {
+      updateData.sessionName = name;
+    }
+
+    // Update session
+    const updatedSession = await sessionService.updateSessionById(sessionId, updateData);
+
+    // Update admin if adminName or adminPin is provided
+    if (adminName || adminPin) {
+      const adminService = new AdminServices();
+      const adminUpdateData: any = {};
+      if (adminName) adminUpdateData.name = adminName;
+      if (adminPin) adminUpdateData.password = adminPin;
+      
+      await adminService.updateAdminBySessionId(sessionId, adminUpdateData);
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedSession,
+      message: 'Session updated successfully'
+    });
+  } catch (error) {
+    console.error("Error updating session:", error);
+    if (error instanceof AppError) {
+      return next(error);
+    }
+    next(new AppError("Failed to update session.", 500));
+  }
+};

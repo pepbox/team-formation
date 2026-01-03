@@ -99,4 +99,32 @@ export default class AdminServices {
     }
     return { ...admin.toObject(), password: undefined };
   }
+
+  async updateAdminBySessionId(
+    sessionId: string,
+    updateData: { name?: string; password?: string }
+  ) {
+    const query = Admin.findOne({ sessionId });
+    if (this.session) {
+      query.session(this.session);
+    }
+    const admin = await query;
+    if (!admin) {
+      throw new Error("Admin not found");
+    }
+
+    if (updateData.name) {
+      admin.name = updateData.name;
+    }
+    if (updateData.password) {
+      admin.password = updateData.password;
+    }
+
+    const options: any = {};
+    if (this.session) {
+      options.session = this.session;
+    }
+    await admin.save(options);
+    return { ...admin.toObject(), password: undefined };
+  }
 }
