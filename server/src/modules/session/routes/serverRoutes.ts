@@ -5,5 +5,4 @@ const router = Router();
 
 router.post("/create-session", sessionController.createSession);
 
-
 export default router;

@@ -1,19 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import OTPInput from "../../../../components/ui/OTPInput";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../app/store";
 import { useLoginAdminMutation } from "../adminAuthApi";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import useAdminSessionNavigate from "../../../../hooks/useAdminNavigate";
 
 const AdminLoginForm = () => {
+  const [searchParams] = useSearchParams();
   const [pin, setPin] = useState("");
+  const hasAutoLoggedIn = useRef(false);
   const { isAuthenticated } = useSelector(
     (state: RootState) => state.adminAuth
   );
   const { adminSessionBasePath } = useAdminSessionNavigate();
   const { sessionId } = useSelector((state: RootState) => state.session);
   const [loginAdmin, { isLoading, error }] = useLoginAdminMutation();
+
+  // Auto-fill and auto-login if pin is provided in URL query params
+  useEffect(() => {
+    const pinFromUrl = searchParams.get("pin");
+    if (pinFromUrl && pinFromUrl.length === 4 && /^\d{4}$/.test(pinFromUrl) && !hasAutoLoggedIn.current) {
+      setPin(pinFromUrl);
+      hasAutoLoggedIn.current = true;
+      // Trigger login automatically
+      loginAdmin({ password: pinFromUrl, sessionId: sessionId });
+    }
+  }, [searchParams, sessionId, loginAdmin]);
 
   const handlePinChange = (value: string) => {
     setPin(value);
